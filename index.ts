@@ -8,6 +8,7 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import packageJSON from "./package.json" with { type: "json" };
 import { Locale } from "@/utils/locales.js";
+import "dotenv/config";
 
 process.title = `Advanced Discord OwO Tool Farm v${packageJSON.version} - Copyright 2025 © Elysia x Kyou Izumi`;
 console.clear();

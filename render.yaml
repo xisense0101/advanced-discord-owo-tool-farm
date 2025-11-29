@@ -1,0 +1,132 @@
+services:
+  # Background Worker - for long-running Discord bot process
+  - type: worker
+    name: advanced-discord-owo-bot
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start start-env
+    autoDeploy: true
+    
+    envVars:
+      # ============================================
+      # REQUIRED ENVIRONMENT VARIABLES
+      # ============================================
+      - key: DISCORD_TOKEN
+        sync: false
+        
+      - key: GUILD_ID
+        sync: false
+        
+      - key: CHANNEL_IDS
+        sync: false
+      
+      # ============================================
+      # NOTIFICATION SETTINGS
+      # ============================================
+      - key: WAY_NOTIFY
+        value: webhook
+        
+      - key: WEBHOOK_URL
+        sync: false
+        
+      - key: ADMIN_ID
+        sync: false
+        
+      # ============================================
+      # BOT SETTINGS
+      # ============================================
+      - key: PREFIX
+        value: "!"
+      
+      # ============================================
+      # CAPTCHA SETTINGS
+      # ============================================
+      - key: CAPTCHA_API
+        value: 2captcha
+        
+      - key: CAPTCHA_API_KEY
+        sync: false
+      
+      # ============================================
+      # HUNTBOT SETTINGS
+      # ============================================
+      - key: AUTO_HUNTBOT
+        value: true
+        
+      - key: AUTO_TRAIT
+        value: efficiency
+        
+      - key: USE_ADOTF_API
+        value: true
+      
+      # ============================================
+      # AUTO PRAY SETTINGS
+      # ============================================
+      - key: AUTO_PRAY
+        value: pray
+      
+      # ============================================
+      # GEM SETTINGS
+      # ============================================
+      - key: AUTO_GEM
+        value: 0
+        
+      - key: GEM_TIER
+        value: common,uncommon,rare,epic,mythical
+        
+      - key: USE_SPECIAL_GEM
+        value: false
+      
+      # ============================================
+      # LOOTBOX SETTINGS
+      # ============================================
+      - key: AUTO_LOOTBOX
+        value: true
+        
+      - key: AUTO_FABLED_LOOTBOX
+        value: false
+      
+      # ============================================
+      # QUOTE & RPP SETTINGS
+      # ============================================
+      - key: AUTO_QUOTE
+        value: owo
+        
+      - key: AUTO_RPP
+        value: run,pup,piku
+      
+      # ============================================
+      # AUTOMATION TOGGLES
+      # ============================================
+      - key: AUTO_DAILY
+        value: true
+        
+      - key: AUTO_COOKIE
+        value: true
+        
+      - key: AUTO_CLOVER
+        value: true
+        
+      - key: USE_CUSTOM_PREFIX
+        value: true
+        
+      - key: AUTO_SLEEP
+        value: true
+        
+      - key: AUTO_SELL
+        value: true
+        
+      - key: AUTO_RELOAD
+        value: true
+        
+      - key: AUTO_RESUME
+        value: true
+        
+      - key: SHOW_RPC
+        value: true
+      
+      # Node environment
+      - key: NODE_ENV
+        value: production
