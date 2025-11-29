@@ -1,131 +1,285 @@
-# Deploying to Render
+# Deploying Discord OwO Bot - Free Hosting Options
 
-This guide will walk you through deploying the Advanced Discord OwO Tool Farm bot to [Render](https://render.com) as a **Background Worker** using environment variables.
+This guide covers **FREE** deployment options for the Advanced Discord OwO Tool Farm bot.
 
-## 🎯 Important: This is a Background Worker, NOT a Web Service
+## 🎯 Important: This is a Long-Running Process
 
-Discord bots are **long-running processes** that need to stay connected 24/7. They don't serve HTTP requests, so:
-- ✅ Deploy as **Background Worker** on Render
-- ❌ **DO NOT** deploy as Web Service (will fail health checks)
-- ❌ **CANNOT** deploy to Vercel/Netlify (serverless platforms kill long-running processes)
+Discord bots need to stay connected 24/7. They are NOT web servers, so:
+- ✅ Need platforms that support **long-running processes**
+- ❌ **CANNOT** use Vercel/Netlify (serverless - kills processes after seconds)
+- ⚠️ **Render Background Workers** - NO FREE TIER (paid only)
+
+## 🆓 Free Deployment Options (Ranked)
+
+### 1. **Railway** ⭐ BEST FREE OPTION
+- **Free Tier**: $5 credit/month (enough for small bots)
+- **No credit card required** for trial
+- **Pros**: Easy setup, doesn't sleep, great for Discord bots
+- **Cons**: Limited free credits
+
+### 2. **Fly.io** ⭐ RECOMMENDED
+- **Free Tier**: 3 shared VMs, 160GB bandwidth/month
+- **Pros**: Generous free tier, global deployment
+- **Cons**: Requires credit card for verification
+
+### 3. **Koyeb** 
+- **Free Tier**: 1 service, auto-sleeps after inactivity
+- **Pros**: No credit card needed
+- **Cons**: Sleeps after 30 mins inactivity (not ideal for bots)
+
+### 4. **Render (Web Service with Workaround)** ⚠️
+- **Free Tier**: Web services only (spins down after 15 mins)
+- **Workaround**: Keep alive with external pings
+- **Cons**: Not reliable, bot will disconnect frequently
+
+### 5. **Oracle Cloud (Free Tier)** 💪 BEST FOR 24/7
+- **Free Tier**: 2 free VMs forever (ARM-based)
+- **Pros**: TRUE 24/7 hosting, no time limits
+- **Cons**: Requires credit card, manual server setup (VPS)
+
+### 6. **Your Own Computer/VPS** 💯 MOST RELIABLE
+- **Cost**: Free (if you have a PC/Raspberry Pi)
+- **Pros**: Full control, truly free, no limits
+- **Cons**: Requires your machine to run 24/7
 
 ## Prerequisites
 
-- A Render account (sign up at [render.com](https://render.com))
 - Your Discord account token
 - Discord server (guild) ID and channel ID(s)
 - (Optional) A webhook URL for notifications
 - (Optional) Captcha API key (2captcha or yescaptcha)
+- `.env` file with your configuration (copy from `.env.example`)
 
-## Quick Start (Using render.yaml)
+---
 
-1. **Fork/Clone this repository** to your GitHub account
+# 🚀 Deployment Guides
 
-2. **Push your code** to GitHub (if you made any changes)
+## Option 1: Railway (EASIEST & FREE) ⭐
 
-3. **Go to Render Dashboard**
-   - Visit https://dashboard.render.com
-   - Click "New +" → "Blueprint"
-   
-4. **Connect your repository**
-   - Select your GitHub repository
-   - Render will automatically detect `render.yaml`
-   
-5. **Configure Environment Variables**
-   
-   After the blueprint is loaded, you'll need to set these **required** variables:
-   
-   | Variable | Description | Example |
-   |----------|-------------|---------|
-   | `DISCORD_TOKEN` | Your Discord account token | `xxx.yyy.zzz` |
-   | `GUILD_ID` | Discord server ID | `123456789012345678` |
-   | `CHANNEL_IDS` | Channel IDs (comma-separated) | `111111111111111111,222222222222222222` |
-   | `WEBHOOK_URL` | Discord webhook for notifications | `https://discord.com/api/webhooks/...` |
-   | `ADMIN_ID` | Your Discord user ID | `123456789012345678` |
-   | `CAPTCHA_API_KEY` | API key for captcha service | `your-api-key` |
+**Free Tier**: $5/month credit (lasts ~500 hours for small bots)
 
-6. **Deploy**
-   - Click "Apply"
-   - Render will build and deploy your bot automatically
+### Step-by-Step:
 
-## Manual Deployment (Without render.yaml)
+1. **Create Account**
+   - Go to https://railway.app
+   - Sign up with GitHub
 
-If you prefer not to use the blueprint:
+2. **Create New Project**
+   - Click "New Project"
+   - Select "Deploy from GitHub repo"
+   - Connect your repository
 
-### Step 1: Create a New Background Worker
+3. **Configure Service**
+   - Railway auto-detects Node.js
+   - Go to "Variables" tab
+   - Click "RAW Editor"
+   - Paste your entire `.env` file content
 
-1. Go to https://dashboard.render.com
-2. Click "New +" → **"Background Worker"** (NOT Web Service!)
-3. Connect your GitHub repository
-4. Configure the service:
-   - **Name**: `advanced-discord-owo-bot` (or any name you prefer)
-   - **Region**: Choose closest to you
-   - **Branch**: `main`
-   - **Runtime**: `Node`
+4. **Set Build & Start Commands** (if not auto-detected)
+   - Click "Settings" tab
    - **Build Command**: `npm install && npm run build`
    - **Start Command**: `npm start start-env`
-   - **Instance Type**: `Free` (or upgrade if needed)
 
-### Step 2: Configure Environment Variables
+5. **Deploy**
+   - Railway will automatically deploy
+   - Check "Deployments" tab for logs
 
-In the "Environment" section, add the following variables:
+**That's it!** Your bot will run 24/7 until credits run out.
 
-#### Required Variables
+---
 
-```env
-DISCORD_TOKEN=your.discord.token.here
-GUILD_ID=123456789012345678
-CHANNEL_IDS=111111111111111111,222222222222222222
-```
+## Option 2: Fly.io (GENEROUS FREE TIER) ⭐
 
-#### Notification Settings (Optional but Recommended)
+**Free Tier**: 3 shared VMs, 160GB transfer/month
 
-```env
-WAY_NOTIFY=webhook
-WEBHOOK_URL=https://discord.com/api/webhooks/your-webhook-url
-ADMIN_ID=123456789012345678
-```
+### Step-by-Step:
 
-#### Captcha Settings (Optional)
+1. **Install Fly CLI**
+   ```bash
+   # Windows (PowerShell)
+   iwr https://fly.io/install.ps1 -useb | iex
+   ```
 
-```env
-CAPTCHA_API=2captcha
-CAPTCHA_API_KEY=your-captcha-api-key
-```
+2. **Login/Signup**
+   ```bash
+   fly auth signup
+   # or if you have account
+   fly auth login
+   ```
 
-#### Bot Automation Settings (Optional - defaults shown)
+3. **Create fly.toml** in your project root:
+   ```toml
+   app = "your-owo-bot"
+   
+   [build]
+     builder = "heroku/buildpacks:20"
+   
+   [env]
+     NODE_ENV = "production"
+   
+   [[services]]
+     internal_port = 8080
+     protocol = "tcp"
+   
+     [services.concurrency]
+       hard_limit = 25
+       soft_limit = 20
+   ```
 
-```env
-AUTO_HUNTBOT=true
-AUTO_TRAIT=efficiency
-USE_ADOTF_API=true
-AUTO_PRAY=pray
-AUTO_GEM=0
-GEM_TIER=common,uncommon,rare,epic,mythical
-USE_SPECIAL_GEM=false
-AUTO_LOOTBOX=true
-AUTO_FABLED_LOOTBOX=false
-AUTO_QUOTE=owo
-AUTO_RPP=run,pup,piku
-AUTO_DAILY=true
-AUTO_COOKIE=true
-AUTO_CLOVER=true
-USE_CUSTOM_PREFIX=true
-AUTO_SLEEP=true
-AUTO_SELL=true
-AUTO_RELOAD=true
-AUTO_RESUME=true
-SHOW_RPC=true
-PREFIX=!
-```
+4. **Set Environment Variables**
+   ```bash
+   # Set each variable from your .env file
+   fly secrets set DISCORD_TOKEN="your-token"
+   fly secrets set GUILD_ID="your-guild-id"
+   fly secrets set CHANNEL_IDS="channel1,channel2"
+   fly secrets set WAY_NOTIFY="webhook,popup"
+   fly secrets set WEBHOOK_URL="your-webhook-url"
+   fly secrets set PREFIX="t"
+   # ... set all other variables
+   ```
 
-### Step 3: Deploy
+5. **Deploy**
+   ```bash
+   fly deploy
+   ```
 
-Click "Create Background Worker" and Render will:
-1. Clone your repository
-2. Install dependencies
-3. Build the TypeScript code
-4. Start the bot with your environment variables
+6. **Check Logs**
+   ```bash
+   fly logs
+   ```
+
+---
+
+## Option 3: Oracle Cloud Free Tier (BEST FOR 24/7) 💪
+
+**Free Tier**: 2 ARM VMs (1GB RAM each) FOREVER - No time limits!
+
+### Step-by-Step:
+
+1. **Create Oracle Cloud Account**
+   - Go to https://www.oracle.com/cloud/free/
+   - Sign up (requires credit card but won't be charged)
+
+2. **Create Compute Instance**
+   - Go to "Compute" → "Instances"
+   - Click "Create Instance"
+   - Choose: **Always Free Eligible** (ARM-based)
+   - OS: Ubuntu 22.04 LTS
+
+3. **Connect via SSH**
+   ```bash
+   ssh ubuntu@your-instance-ip
+   ```
+
+4. **Setup Node.js**
+   ```bash
+   # Install Node.js
+   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+   sudo apt-get install -y nodejs git
+   
+   # Install PM2 (process manager)
+   sudo npm install -g pm2
+   ```
+
+5. **Clone & Setup Project**
+   ```bash
+   # Clone your repo
+   git clone https://github.com/your-username/advanced-discord-owo-tool-farm.git
+   cd advanced-discord-owo-tool-farm
+   
+   # Install dependencies
+   npm install
+   
+   # Build
+   npm run build
+   
+   # Create .env file
+   nano .env
+   # Paste your environment variables, save (Ctrl+X, Y, Enter)
+   ```
+
+6. **Run with PM2**
+   ```bash
+   # Start bot
+   pm2 start npm --name "owo-bot" -- start start-env
+   
+   # Save PM2 config
+   pm2 save
+   
+   # Auto-start on reboot
+   pm2 startup
+   # Run the command it outputs
+   ```
+
+7. **Monitor**
+   ```bash
+   pm2 logs owo-bot
+   pm2 status
+   ```
+
+**Your bot will run 24/7 FOREVER for FREE!**
+
+---
+
+## Option 4: Run on Your Own Computer (100% FREE) 💻
+
+### Windows:
+
+1. **Open PowerShell in project directory**
+
+2. **Create .env file** (already done if you have `.env`)
+
+3. **Install & Build**
+   ```powershell
+   npm install
+   npm run build
+   ```
+
+4. **Run**
+   ```powershell
+   npm start start-env
+   ```
+
+5. **Keep Running 24/7 with PM2** (optional)
+   ```powershell
+   npm install -g pm2-windows-startup
+   npm install -g pm2
+   
+   pm2 start npm --name "owo-bot" -- start start-env
+   pm2 save
+   pm2-startup install
+   ```
+
+**Pros**: Completely free, full control  
+**Cons**: Your computer must stay on 24/7
+
+---
+
+# 📊 Comparison Table
+
+| Platform | Free Tier | Setup Difficulty | 24/7 Runtime | Credit Card |
+|----------|-----------|------------------|--------------|-------------|
+| **Railway** | $5/mo credit (~500hrs) | ⭐ Easy | ✅ Yes | ❌ No |
+| **Fly.io** | 3 VMs, 160GB transfer | ⭐⭐ Medium | ✅ Yes | ✅ Yes |
+| **Oracle Cloud** | 2 VMs forever | ⭐⭐⭐ Hard | ✅ Yes | ✅ Yes |
+| **Your PC** | Unlimited | ⭐ Easy | ✅ Yes | ❌ No |
+| **Koyeb** | 1 service | ⭐ Easy | ❌ Sleeps | ❌ No |
+| Render | ❌ No free workers | Easy | N/A | Yes |
+| Vercel | ❌ Not compatible | N/A | ❌ No | No |
+
+---
+
+# 🎯 Recommendation
+
+**For Beginners**: Use **Railway** (easiest, no credit card)  
+**For Long-term**: Use **Oracle Cloud Free Tier** (true 24/7 forever)  
+**For Quick Test**: Use **Your Own Computer**
+
+---
+
+---
+
+# 📖 Additional Information
 
 ## Getting Your Discord Token
 
@@ -153,22 +307,9 @@ Click "Create Background Worker" and Render will:
 3. Click "New Webhook"
 4. Configure and copy the webhook URL
 
-## Monitoring Your Bot
+---
 
-### View Logs
-
-1. Go to your service in Render Dashboard
-2. Click on "Logs" tab
-3. You'll see real-time output from your bot
-
-### Check Status
-
-The "Events" tab shows:
-- Build status
-- Deploy history
-- Any errors that occurred
-
-## Troubleshooting
+# 🛠️ Troubleshooting
 
 ### Bot Doesn't Start
 
@@ -200,18 +341,13 @@ This means one or more environment variables are missing or invalid.
 
 Common causes:
 - TypeScript compilation errors (check the build logs)
-- Missing dependencies (should auto-install)
-- Node version mismatch (Render uses Node 18+ by default)
+- Missing dependencies (run `npm install` locally first)
+- Node version mismatch (most platforms use Node 18+)
+- Out of memory during build (upgrade plan or use lighter build)
 
-### Bot Keeps Restarting
+---
 
-Render's free tier may restart your service if:
-- It uses too much memory
-- It crashes repeatedly
-- **Note**: Free Background Workers don't spin down like Web Services
-- You can upgrade to a paid plan for better stability
-
-## Security Best Practices
+# 🔒 Security Best Practices
 
 ✅ **DO:**
 - Use environment variables for all sensitive data
@@ -223,105 +359,18 @@ Render's free tier may restart your service if:
 - Commit `.env` files to git
 - Share your Discord token
 - Use your main Discord account (use an alt account)
-- Share your Render dashboard access
+- Share your deployment platform credentials
 
-## Updating Your Bot
+---
 
-When you push changes to GitHub:
-1. Render will automatically detect the changes
-2. It will rebuild and redeploy your bot
-3. Check the "Events" tab to monitor the deployment
-
-To disable auto-deploy:
-- Service Settings → "Auto-Deploy" → Toggle off
-
-## Cost
-
-- **Free Tier**: 750 hours/month for Background Workers (enough for one bot running 24/7)
-- Unlike Web Services, **Background Workers don't spin down** on free tier
-- The bot will run continuously as long as you have available hours
-- Upgrade to paid plans for:
-  - Unlimited hours
-  - More resources
-  - Better performance
-
-## Support
+# 🔄 Updating Your Bot
 
 If you encounter issues:
 
 1. Check the [GitHub Issues](https://github.com/Kyou-Izumi/advanced-discord-owo-tool-farm/issues)
-2. Review Render's [documentation](https://render.com/docs)
-3. Make sure all environment variables match the format in `.env.example`
-
-## Alternative: Local Testing
-
-Before deploying to Render, test locally:
-
-1. Copy `.env.example` to `.env`:
-   ```bash
-   cp .env.example .env
-   ```
-
-2. Fill in your credentials in `.env`
-
-3. Run locally:
-   ```bash
-   npm install
-   npm run build
-   npm start start-env
-   ```
-
-4. If it works locally, it should work on Render!
-
-## Alternative Deployment Platforms
-
-### ✅ **Other Platforms That Work:**
-
-1. **Railway** - Similar to Render, supports long-running processes
-2. **Fly.io** - Good for Discord bots, has free tier
-3. **DigitalOcean App Platform** - Supports workers
-4. **Heroku** - Works but expensive (no free tier anymore)
-5. **VPS (Linode, DigitalOcean Droplet, AWS EC2)** - Full control but requires server management
-
-### ❌ **Platforms That DON'T Work:**
-
-1. **Vercel** - Serverless only, kills processes after 10-60 seconds
-2. **Netlify** - Static sites and serverless functions only
-3. **GitHub Pages** - Static hosting only
-4. **Cloudflare Pages** - Static/serverless only
-
-### 🏠 **Can I Deploy as a Normal Node.js Project?**
-
-**Yes!** This IS a normal Node.js project. You can run it anywhere that supports:
-- Long-running Node.js processes
-- Environment variables
-- Outbound HTTPS connections (for Discord API)
-
-**Example on a VPS:**
-```bash
-# SSH into your server
-ssh user@your-server.com
-
-# Clone your repo
-git clone https://github.com/your-username/advanced-discord-owo-tool-farm.git
-cd advanced-discord-owo-tool-farm
-
-# Install dependencies
-npm install
-
-# Build
-npm run build
-
-# Create .env file
-nano .env
-# (paste your environment variables)
-
-# Run with PM2 (process manager)
-npm install -g pm2
-pm2 start npm --name "owo-bot" -- start start-env
-pm2 save
-pm2 startup
-```
+2. Review your platform's documentation
+3. Test locally first: `npm start start-env`
+4. Make sure all environment variables match `.env.example`
 
 ---
 
